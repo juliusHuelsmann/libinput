@@ -529,8 +529,15 @@ tp_process_absolute(struct tp_dispatch *tp,
 			tp->nactive_slots += 1;
 			tp_new_touch(tp, t, time);
 		} else {
-			assert(tp->nactive_slots >= 1);
-			tp->nactive_slots -= 1;
+			// XXX: ugly bug fix which (most likely) does
+			// not really fix the bug but prevents the
+			// application from crashing.
+			if (tp->nactive_slots >= 1) { 
+				tp->nactive_slots -= 1; 
+			} else {
+				evdev_log_bug_kernel(tp->device,
+						"Prevented assert(false) :) Good luck :) you'll crash!");
+			}
 			tp_end_sequence(tp, t, time);
 		}
 		break;
